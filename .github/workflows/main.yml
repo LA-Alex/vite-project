@@ -25,4 +25,5 @@ jobs:
           KINTONE_BASE_URL: ${{ secrets.KINTONE_BASE_URL }}
           KINTONE_USERNAME: ${{ secrets.KINTONE_USERNAME }}
           KINTONE_PASSWORD: ${{ secrets.KINTONE_PASSWORD }}
-        run: node sync-to-kintone.js
+       run: node src/sync-to-kintone.js
+
