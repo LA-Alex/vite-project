@@ -75,3 +75,21 @@ const deployToKintone = async () => {
 };
 
 deployToKintone();
+try {
+  const res = await axios.get(`${baseURL}/k/v1/app/customize.json`, {
+    params: { app: appId },
+    auth: { username, password },
+    headers: { "Content-Type": "application/json" },
+  });
+
+  const jsFiles = res.data.desktop.js.map((f) => f.file?.name || f.url);
+  const cssFiles = res.data.desktop.css.map((f) => f.file?.name || f.url);
+
+  console.log("✅ 部署後 JS 檔案：", jsFiles);
+  console.log("✅ 部署後 CSS 檔案：", cssFiles);
+} catch (err) {
+  console.error(
+    "❌ 無法取得 App 的 JS/CSS 設定",
+    err.response?.data || err.message
+  );
+}
