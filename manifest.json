@@ -1,5 +1,5 @@
 {
-  "app": "42",
+  "app": "333",
   "scope": "ALL",
   "desktop": {
     "js": ["dist/app.js"],
