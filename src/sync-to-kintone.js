@@ -2,13 +2,17 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 import FormData from "form-data";
+import dotenv from "dotenv";
 import { fileURLToPath } from "url";
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const baseURL = process.env.KINTONE_BASE_URL;
-const apiToken = process.env.KINTONE_API_TOKEN;
+const username = process.env.KINTONE_USERNAME;
+const password = process.env.KINTONE_PASSWORD;
 const appId = 333;
 
 const files = ["main.js", "App.css"];
@@ -18,10 +22,8 @@ const uploadFile = async (filePath) => {
   form.append("file", fs.createReadStream(filePath));
 
   const res = await axios.post(`${baseURL}/k/v1/file.json`, form, {
-    headers: {
-      ...form.getHeaders(),
-      "X-Cybozu-API-Token": apiToken,
-    },
+    headers: form.getHeaders(),
+    auth: { username, password },
   });
 
   return res.data.fileKey;
@@ -52,10 +54,8 @@ const deployToKintone = async () => {
         desktop: { js: jsFiles, css: cssFiles },
       },
       {
-        headers: {
-          "Content-Type": "application/json",
-          "X-Cybozu-API-Token": apiToken,
-        },
+        headers: { "Content-Type": "application/json" },
+        auth: { username, password },
       }
     );
     console.log("預覽設定成功");
@@ -67,20 +67,16 @@ const deployToKintone = async () => {
         revert: false,
       },
       {
-        headers: {
-          "Content-Type": "application/json",
-          "X-Cybozu-API-Token": apiToken,
-        },
+        headers: { "Content-Type": "application/json" },
+        auth: { username, password },
       }
     );
     console.log("已成功套用變更到 Kintone App");
 
     const res = await axios.get(`${baseURL}/k/v1/app/customize.json`, {
       params: { app: appId },
-      headers: {
-        "Content-Type": "application/json",
-        "X-Cybozu-API-Token": apiToken,
-      },
+      headers: { "Content-Type": "application/json" },
+      auth: { username, password },
     });
 
     const jsList = res.data.desktop.js.map(f => f.file?.name || f.url);
