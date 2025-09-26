@@ -23,7 +23,6 @@ jobs:
       - name: Run sync script
         env:
           KINTONE_BASE_URL: ${{ secrets.KINTONE_BASE_URL }}
-          KINTONE_USERNAME: ${{ secrets.KINTONE_USERNAME }}
-          KINTONE_PASSWORD: ${{ secrets.KINTONE_PASSWORD }}
+          KINTONE_API_TOKEN: ${{ secrets.KINTONE_API_TOKEN }}
         run: node src/sync-to-kintone.js
 
