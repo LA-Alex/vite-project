@@ -8,9 +8,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const baseURL = process.env.KINTONE_BASE_URL;
-const username = process.env.KINTONE_USERNAME;
-const password = process.env.KINTONE_PASSWORD;
-const appId = 333; // ← 你的 App ID
+const apiToken = process.env.KINTONE_API_TOKEN;
+const appId = 333;
 
 const files = ["main.js", "App.css"];
 
@@ -19,8 +18,10 @@ const uploadFile = async (filePath) => {
   form.append("file", fs.createReadStream(filePath));
 
   const res = await axios.post(`${baseURL}/k/v1/file.json`, form, {
-    auth: { username, password },
-    headers: form.getHeaders(),
+    headers: {
+      ...form.getHeaders(),
+      "X-Cybozu-API-Token": apiToken,
+    },
   });
 
   return res.data.fileKey;
@@ -51,8 +52,10 @@ const deployToKintone = async () => {
         desktop: { js: jsFiles, css: cssFiles },
       },
       {
-        auth: { username, password },
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Cybozu-API-Token": apiToken,
+        },
       }
     );
     console.log("預覽設定成功");
@@ -64,11 +67,26 @@ const deployToKintone = async () => {
         revert: false,
       },
       {
-        auth: { username, password },
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Cybozu-API-Token": apiToken,
+        },
       }
     );
     console.log("已成功套用變更到 Kintone App");
+
+    const res = await axios.get(`${baseURL}/k/v1/app/customize.json`, {
+      params: { app: appId },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Cybozu-API-Token": apiToken,
+      },
+    });
+
+    const jsList = res.data.desktop.js.map(f => f.file?.name || f.url);
+    const cssList = res.data.desktop.css.map(f => f.file?.name || f.url);
+    console.log("✅ 部署後 JS 檔案：", jsList);
+    console.log("✅ 部署後 CSS 檔案：", cssList);
   } catch (err) {
     console.error("部署失敗", err.response?.data || err.message);
   }
