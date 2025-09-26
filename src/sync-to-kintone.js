@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 const baseURL = process.env.KINTONE_BASE_URL;
 const username = process.env.KINTONE_USERNAME;
 const password = process.env.KINTONE_PASSWORD;
-const appId = 333; // ← 替換成你的 App ID
+const appId = 333; // ← 你的 App ID
 
 const files = ["main.js", "App.css"];
 
@@ -43,7 +43,7 @@ const deployToKintone = async () => {
   }
 
   try {
-    const res = await axios.post(
+    await axios.post(
       `${baseURL}/k/v1/preview/app/customize.json`,
       {
         app: appId,
@@ -55,7 +55,20 @@ const deployToKintone = async () => {
         headers: { "Content-Type": "application/json" },
       }
     );
-    console.log("部署成功", res.data);
+    console.log("預覽設定成功");
+
+    await axios.post(
+      `${baseURL}/k/v1/app/deploy.json`,
+      {
+        apps: [{ app: appId }],
+        revert: false,
+      },
+      {
+        auth: { username, password },
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    console.log("已成功套用變更到 Kintone App");
   } catch (err) {
     console.error("部署失敗", err.response?.data || err.message);
   }
