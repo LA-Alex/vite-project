@@ -12,7 +12,7 @@ const username = process.env.KINTONE_USERNAME;
 const password = process.env.KINTONE_PASSWORD;
 
 // 要上傳的檔案清單
-const files = ["main.js", "test.css"];
+const files = ["main.js", "App.css"];
 
 for (const file of files) {
   const content = fs.readFileSync(path.join(__dirname, file), "utf8");
